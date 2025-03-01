@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ post.title }} | Echo{% endblock %}
+
+{% block content %}
+<div class="post-detail">
+    <div class="post-detail-header">
+        <h2>{{ post.title }}</h2>
+        <div class="post-meta">
+            <p>By <a href="{{ url_for('profile', username=post.author.username) }}">{{ post.author.username }}</a></p>
+            <p>{{ post.timestamp.strftime('%B %d, %Y at %H:%M') }}</p>
+        </div>
+    </div>
+    
+    <div class="post-detail-content">
+        {{ post.content|safe }}
+    </div>
+    
+    <div class="post-bottom">
+        <div class="post-likes">
+            <div class="like-section">
+                <span id="likes-count">{{ post.likes_count() }}</span> likes
+                
+                {% if current_user.is_authenticated %}
+                    {% if current_user.has_liked_post(post) %}
+                        <form action="{{ url_for('unlike_post', post_id=post.id, next=request.path) }}" method="post" class="like-form">
+                            <button type="submit" class="btn btn-like liked">
+                                <i class="fas fa-heart"></i> Unlike
+                            </button>
+                        </form>
+                    {% else %}
+                        <form action="{{ url_for('like_post', post_id=post.id, next=request.path) }}" method="post" class="like-form">
+                            <button type="submit" class="btn btn-like">
+                                <i class="far fa-heart"></i> Like
+                            </button>
+                        </form>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="post-actions">
+            <a href="{{ url_for('index') }}" class="btn btn-secondary">Back to Newsfeed</a>
+        </div>
+    </div>
+    
+</div>
+
+{% if current_user.is_authenticated %}
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const likeForms = document.querySelectorAll('.like-form');
+        
+        likeForms.forEach(form => {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const url = this.getAttribute('action');
+                
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('likes-count').textContent = data.likes_count;
+                    
+                    const button = this.querySelector('button');
+                    const icon = button.querySelector('i');
+                    
+                    if (data.liked) {
+                        button.classList.add('liked');
+                        icon.className = 'fas fa-heart';
+                        button.textContent = ' Unlike';
+                        button.prepend(icon);
+                        this.action = "{{ url_for('unlike_post', post_id=post.id, next=request.path) }}";
+                    } else {
+                        button.classList.remove('liked');
+                        icon.className = 'far fa-heart';
+                        button.textContent = ' Like';
+                        button.prepend(icon);
+                        this.action = "{{ url_for('like_post', post_id=post.id, next=request.path) }}";
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            });
+        });
+    });
+    </script>
+{% endif %}
+
+{% endblock %}

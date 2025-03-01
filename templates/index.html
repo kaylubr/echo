@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block title %}Echo{% endblock %}
+
+{% block content %}
+<div class="home-container">
+    <div class="sidebar">
+        <div class="sidebar-section">
+            <h3>Welcome{% if current_user.is_authenticated %}, {{ current_user.username }}{% endif %}!</h3>
+            {% if current_user.is_authenticated %}
+                <p>Share your thoughts with friends</p>
+                <a href="{{ url_for('create_post') }}" class="btn btn-primary">Create New Post</a>
+            {% else %}
+                <p>Join our community today!</p>
+                <div class="auth-buttons">
+                    <a href="{{ url_for('login') }}" class="btn btn-primary">Login</a>
+                    <a href="{{ url_for('signup') }}" class="btn btn-secondary">Sign Up</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <div class="main-content">
+        <h2>{% if current_user.is_authenticated %}Your Newsfeed{% else %}Recent Posts{% endif %}</h2>
+        
+        {% if posts %}
+            <div class="posts-container">
+                {% for post in posts %}
+                    <div class="post-card">
+                        <div class="post-header">
+                            <img src="https://ui-avatars.com/api/?name={{ post.author.username }}&background=random" alt="Profile" class="avatar">
+                            <div class="post-info">
+                                <h3><a href="{{ url_for('login') }}">{{ post.title }}</a></h3>
+                                <p class="author">By <a href="{{ url_for('login') }}">{{ post.author.username }}</a></p>
+                                <p class="date">{{ post.timestamp.strftime('%B %d, %Y at %H:%M') }}</p>
+                            </div>
+                        </div>
+                        <div class="post-content {% if not current_user.is_authenticated %}blurred-content{% endif %}">
+                            {% if current_user.is_authenticated %}
+                                <p>{{ post.content[:200] }}{% if post.content|length > 200 %}...{% endif %}</p>
+                                <a href="{{ url_for('post', post_id=post.id) }}" class="read-more">Read more</a>
+                            {% else %}
+                                <div class="login-overlay">
+                                    <p>Please <a href="{{ url_for('login') }}">login</a> to view content</p>
+                                </div>
+                                <p class="hidden-content">{{ post.content[:200] }}{% if post.content|length > 200 %}...{% endif %}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <i class="fas fa-newspaper"></i>
+                <p>No posts to display yet.</p>
+                {% if current_user.is_authenticated %}
+                    <p>Create a post or add friends to see their content here!</p>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

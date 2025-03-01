@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block title %}Find People | Echo{% endblock %}
+
+{% block content %}
+<div class="users-container">
+    <h2>Find People</h2>
+    
+    {% if users %}
+        <div class="users-grid">
+            {% for user in users %}
+                <div class="user-card">
+                    <div class="user-avatar">
+                        <img src="https://ui-avatars.com/api/?name={{ user.username }}&background=random" alt="Avatar">
+                    </div>
+                    <div class="user-info">
+                        <h3><a href="{{ url_for('profile', username=user.username) }}">{{ user.username }}</a></h3>
+                        <p class="join-date">Member since {{ user.join_date.strftime('%B %d, %Y') }}</p>
+                    </div>
+                    <div class="user-actions">
+                        {% if current_user.is_friend(user) %}
+                            <a href="{{ url_for('remove_friend', user_id=user.id) }}" class="btn btn-danger">Unfollow</a>
+                        {% else %}
+                            <a href="{{ url_for('add_friend', user_id=user.id) }}" class="btn btn-primary">Follow</a>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <i class="fas fa-users"></i>
+            <p>No other users found.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
