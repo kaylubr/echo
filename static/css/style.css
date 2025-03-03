@@ -1,4 +1,3 @@
-/* static/css/style.css */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
 :root {
@@ -765,7 +764,7 @@ a:hover {
     }
 }
 
-/* Blurred style */
+/* blur it */
 .blurred-content {
     position: relative;
 }
@@ -809,3 +808,203 @@ a:hover {
 .login-overlay a:hover {
     color: var(--primary-dark);
 }
+
+/* edit page style */
+.edit-post-heading {
+    margin: 30px 0 20px;
+    color: var(--primary-color);
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 10px;
+    font-size: 1.75rem;
+    font-weight: 600;
+}
+
+.edit-post-form {
+    background-color: var(--card-color);
+    border-radius: 10px;
+    padding: 25px;
+    box-shadow: var(--box-shadow);
+    margin-bottom: 30px;
+    width: 100%;
+}
+
+.edit-form-group {
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+.edit-form-label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: var(--text-color);
+}
+
+.edit-form-input {
+    width: 100%;
+    padding: 12px;
+    background-color: #181818;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    color: var(--text-color);
+    font-family: 'Poppins', sans-serif;
+    transition: border-color 0.3s;
+    font-size: 1rem;
+}
+
+.edit-form-textarea {
+    width: 100%;
+    padding: 12px;
+    background-color: #181818;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    color: var(--text-color);
+    font-family: 'Poppins', sans-serif;
+    transition: border-color 0.3s;
+    min-height: 200px;
+    resize: vertical;
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+.edit-form-input:focus,
+.edit-form-textarea:focus {
+    border-color: var(--primary-color);
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(118, 171, 174, 0.25);
+}
+
+.edit-form-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 25px;
+}
+
+.edit-form-submit {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+    font-size: 1rem;
+}
+
+.edit-form-submit:hover {
+    background-color: var(--primary-dark);
+    transform: translateY(-2px);
+}
+
+.edit-form-cancel {
+    background-color: var(--secondary-color);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    transition: background-color 0.3s, transform 0.2s;
+    text-align: center;
+    font-size: 1rem;
+}
+
+.edit-form-cancel:hover {
+    background-color: var(--secondary-dark);
+    transform: translateY(-2px);
+    text-decoration: none;
+    color: white;
+}
+
+@media (max-width: 768px) {
+    .edit-post-form {
+        padding: 20px;
+    }
+}
+
+@media (max-width: 576px) {
+    .edit-post-form {
+        padding: 15px;
+    }
+    
+    .edit-form-actions {
+        flex-direction: column;
+    }
+    
+    .edit-form-submit,
+    .edit-form-cancel {
+        width: 100%;
+    }
+}
+
+/* delete modal */
+#deletePostModal {
+    background-color: rgba(0, 0, 0, 0.7);
+  }
+  
+  #deletePostModal .modal-content {
+    background-color: var(--card-color);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    box-shadow: var(--box-shadow);
+  }
+  
+  #deletePostModal .modal-header {
+    border-bottom: 1px solid var(--border-color);
+    padding: 15px;
+  }
+  
+  #deletePostModal .modal-title {
+    color: var(--text-color);
+    margin: 0;
+  }
+  
+  #deletePostModal .modal-body {
+    padding: 15px;
+    color: var(--text-color);
+  }
+  
+  #deletePostModal .modal-footer {
+    border-top: 1px solid var(--border-color);
+    padding: 15px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+  }
+  
+  #deletePostModal .close {
+    color: var(--text-light);
+    background: transparent;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+  }
+  
+  #deletePostModal .close:hover {
+    color: var(--text-color);
+  }
+  
+  #deletePostModal .btn-secondary {
+    background-color: var(--card-color);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    cursor: pointer;
+  }
+  
+  #deletePostModal .btn-secondary:hover {
+    background-color: var(--highlight-color);
+  }
+  
+  #deletePostModal .btn-danger {
+    background-color: var(--danger-color);
+    border: none;
+    color: #fff;
+    cursor: pointer;
+  }
+  
+  #deletePostModal .btn-danger:hover {
+    background-color: var(--danger-dark);
+  }

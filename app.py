@@ -214,6 +214,51 @@ def post(post_id):
     return render_template('post.html', post=post)
 
 
+@app.route('/edit_post/<int:post_id>', methods=['GET', 'POST'])
+@login_required
+def edit_post(post_id):
+    post = Post.query.get_or_404(post_id)
+    
+    # Check if the current user is the author of the post
+    if post.author != current_user:
+        flash('You can only edit your own posts!')
+        return redirect(url_for('post', post_id=post.id))
+    
+    if request.method == 'POST':
+        title = request.form.get('title')
+        content = request.form.get('content')
+        
+        if not title or not content:
+            flash('Title and content are required!')
+            return redirect(url_for('edit_post', post_id=post.id))
+        
+        post.title = title
+        post.content = content
+        db.session.commit()
+        
+        flash('Your post has been updated!')
+        return redirect(url_for('post', post_id=post.id))
+    
+    return render_template('edit_post.html', post=post)
+
+
+@app.route('/delete_post/<int:post_id>', methods=['POST'])
+@login_required
+def delete_post(post_id):
+    post = Post.query.get_or_404(post_id)
+    
+    # Check if the current user is the author of the post
+    if post.author != current_user:
+        flash('You can only delete your own posts!')
+        return redirect(url_for('post', post_id=post.id))
+    
+    db.session.delete(post)
+    db.session.commit()
+    
+    flash('Your post has been deleted!')
+    return redirect(url_for('index'))
+
+
 @app.route('/like/<int:post_id>', methods=['POST'])
 @login_required
 def like_post(post_id):

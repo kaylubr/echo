@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Post | Echo{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2 class="edit-post-heading">Edit Post</h2>
+    <form method="post" class="edit-post-form">
+        <div class="edit-form-group">
+            <label for="title" class="edit-form-label">Title</label>
+            <input type="text" class="edit-form-input" id="title" name="title" value="{{ post.title }}" required>
+        </div>
+        <div class="edit-form-group">
+            <label for="content" class="edit-form-label">Content</label>
+            <textarea class="edit-form-textarea" id="content" name="content" rows="10" required>{{ post.content }}</textarea>
+        </div>
+        <div class="edit-form-actions">
+            <button type="submit" class="edit-form-submit">Update Post</button>
+            <a href="{{ url_for('post', post_id=post.id) }}" class="edit-form-cancel">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
