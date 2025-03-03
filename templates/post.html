@@ -149,6 +149,8 @@
 
     {% if current_user.is_authenticated %}
         <script src="{{ url_for('static', filename='js/comment.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/deletepost.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/like.js') }}"></script>
     {% endif %}
 
 {% endblock %}

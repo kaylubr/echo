@@ -3,8 +3,6 @@
 :root {
     --primary-color: #76ABAE;
     --primary-dark: #3286a0;
-    --secondary-color: #76ABAE;  /* Redundant - same as primary-color */
-    --secondary-dark: #3286a0;   /* Redundant - same as primary-dark */
     --danger-color: #cf6679;
     --danger-dark: #b55a68;
     --text-color: #e0e0e0;
@@ -131,13 +129,14 @@ a:hover {
     color: white;
 }
 
+/* Using primary color variables for secondary button */
 .btn-secondary {
-    background-color: var(--primary-color); /* Updated to use primary instead of duplicate secondary */
+    background-color: var(--primary-color);
     color: white;
 }
 
 .btn-secondary:hover {
-    background-color: var(--primary-dark); /* Updated to use primary-dark instead of duplicate secondary-dark */
+    background-color: var(--primary-dark);
     color: white;
 }
 
@@ -261,7 +260,7 @@ a:hover {
 }
 
 /* Consolidated author and date styles */
-.author, .date, .post-info .author, .post-info .date, .user-info .join-date, .profile-info .join-date, .post-meta, .friends-container .user-info .join-date {
+.author, .date, .post-info .author, .post-info .date, .user-info .join-date, .profile-info .join-date, .post-meta, .friends-container .user-info .join-date, .comment-date {
     font-size: 0.9rem;
     color: var(--text-light);
 }
@@ -341,7 +340,7 @@ a:hover {
 }
 
 /* Consolidated input styles */
-.form-group input, .form-group textarea, .edit-form-input, .edit-form-textarea, .search-input {
+.form-group input, .form-group textarea, .edit-form-input, .edit-form-textarea, .search-input, .comment-form textarea {
     background-color: #181818;
     color: var(--text-color);
     width: 100%;
@@ -352,7 +351,7 @@ a:hover {
     transition: border-color 0.3s;
 }
 
-.form-group input:focus, .form-group textarea:focus, .edit-form-input:focus, .edit-form-textarea:focus, .search-input:focus {
+.form-group input:focus, .form-group textarea:focus, .edit-form-input:focus, .edit-form-textarea:focus, .search-input:focus, .comment-form textarea:focus {
     border-color: var(--primary-color);
     outline: none;
 }
@@ -415,7 +414,7 @@ a:hover {
 }
 
 /* Consolidated heading styles */
-.profile-content h3, .form-container h2, .edit-post-heading, .users-container h2 {
+.profile-content h3, .form-container h2, .edit-post-heading, .users-container h2, .comments-section h3, .card-header > h3 {
     margin-bottom: 20px;
     color: var(--text-color);
     border-bottom: 2px solid var(--border-color);
@@ -466,7 +465,7 @@ a:hover {
 }
 
 /* Consolidated action buttons */
-.post-actions, .edit-form-actions {
+.post-actions, .edit-form-actions, .comment-actions {
     display: flex;
     gap: 10px;
     margin-top: 20px;
@@ -552,7 +551,7 @@ a:hover {
 }
 
 /* Consolidated message styles */
-.search-loading, .search-no-results {
+.search-loading, .search-no-results, .no-comments {
     text-align: center;
     padding: 20px;
     color: var(--text-light);
@@ -641,8 +640,8 @@ a:hover {
     margin-right: 5px;
 }
 
-/* Modals - consolidated common styles */
-#deletePostModal.modal, #logoutModal.logout-modal {
+/* Modals - consolidated styles */
+#deletePostModal, #logoutModal, #deleteCommentModal {
     display: none;
     position: fixed;
     top: 0;
@@ -651,61 +650,45 @@ a:hover {
     height: 100%;
     background-color: rgba(0, 0, 0, 0.7);
     z-index: 1000;
-    justify-content: center;
-    align-items: center;
 }
 
-#deletePostModal .modal-content, #logoutModal.logout-modal .modal-content {
+.modal-content {
     background-color: var(--card-color);
     border-radius: 8px;
     box-shadow: var(--box-shadow);
     border: 1px solid var(--border-color);
     color: var(--text-color);
     width: 90%;
-}
-
-#deletePostModal .modal-content {
     max-width: 500px;
-    margin: auto;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+#logoutModal .modal-content {
+    max-width: 400px;
 }
 
-#logoutModal.logout-modal .modal-content {
-    border-radius: 5px;
-    width: 400px;
-    max-width: 90%;
-}
-
-#deletePostModal .modal-header, #logoutModal.logout-modal .modal-header {
+.modal-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     border-bottom: 1px solid var(--border-color);
-}
-
-#deletePostModal .modal-header {
     padding: 16px;
-    background-color: var(--card-color);
     border-radius: 8px 8px 0 0;
 }
 
-#logoutModal.logout-modal .modal-header {
-    padding: 15px 20px;
-}
-
-#deletePostModal .modal-title, #logoutModal.logout-modal .modal-header h2 {
+.modal-title, .modal-header h2 {
     margin: 0;
     font-size: 1.25rem;
     color: var(--text-color);
 }
 
-#deletePostModal .close, #logoutModal.logout-modal .modal-header .close-modal {
+.close, .close-modal {
     background: none;
     border: none;
     cursor: pointer;
     color: var(--text-light);
-}
-
-#deletePostModal .close {
     font-size: 1.5rem;
     font-weight: 700;
     line-height: 1;
@@ -714,72 +697,45 @@ a:hover {
     transition: color 0.2s;
 }
 
-#logoutModal.logout-modal .modal-header .close-modal {
-    font-size: 24px;
-}
-
-#deletePostModal .close:hover, #logoutModal.logout-modal .modal-header .close-modal:hover {
+.close:hover, .close-modal:hover {
     color: var(--text-color);
 }
 
-#deletePostModal .modal-body, #logoutModal.logout-modal .modal-body {
+.modal-body {
     padding: 20px;
 }
 
-#deletePostModal .modal-body p {
+.modal-body p {
     color: var(--text-color);
     margin: 0;
 }
 
-#deletePostModal .modal-footer, #logoutModal.logout-modal .modal-footer {
+.modal-footer {
     display: flex;
     justify-content: flex-end;
     gap: 12px;
     border-top: 1px solid var(--border-color);
-}
-
-#deletePostModal .modal-footer {
     padding: 16px;
     border-radius: 0 0 8px 8px;
 }
 
-#logoutModal.logout-modal .modal-footer {
-    padding: 15px 20px;
-    gap: 10px;
-}
-
-#deletePostModal .btn-secondary {
+#deletePostModal .btn-secondary, 
+#deleteCommentModal .btn-secondary {
     background-color: var(--highlight-color);
     color: var(--text-color);
     border: 1px solid var(--border-color);
 }
 
-#deletePostModal .btn-secondary:hover {
+#deletePostModal .btn-secondary:hover,
+#deleteCommentModal .btn-secondary:hover {
     background-color: var(--border-color);
 }
 
-#deletePostModal #deletePostForm, #deletePostModal #deletePostForm button {
+#deletePostForm, #deletePostForm button,
+#deleteCommentForm, #deleteCommentForm button {
     margin: 0;
 }
 
-#logoutModal.logout-modal .modal-footer .btn {
-    background-color: var(--danger-color);
-    color: var(--text-color);
-    font-family: 'Poppins', sans-serif;
-    padding: 8px 16px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: 500;
-    transition: background-color 0.2s;
-}
-
-#logoutModal.logout-modal .modal-footer .btn-secondary:hover,
-#logoutModal.logout-modal .modal-footer .btn-danger:hover {
-    background-color: var(--danger-dark);
-}
-
-/* blur it */
 .blurred-content {
     position: relative;
 }
@@ -824,7 +780,99 @@ a:hover {
     color: var(--primary-dark);
 }
 
-/* edit page style - much already consolidated above */
+.comments-section {
+    margin-top: 30px;
+    border-top: 1px solid var(--border-color);
+    padding-top: 20px;
+}
+
+.comment-form {
+    margin-bottom: 25px;
+}
+
+.comment-form textarea {
+    min-height: 80px;
+    margin-bottom: 10px;
+    resize: vertical;
+}
+
+.comments-list {
+    margin-top: 20px;
+}
+
+.form-group > .form-control {
+    resize: none;
+}
+
+.comment {
+    border-bottom: 1px solid var(--border-color);
+    padding: 15px 0;
+    margin-bottom: 10px;
+}
+
+.comment:last-child {
+    border-bottom: none;
+}
+
+.comment-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.comment-user {
+    font-weight: bold;
+}
+
+.comment-content {
+    margin-bottom: 10px;
+    word-break: break-word;
+}
+
+.no-comments {
+    font-style: italic;
+}
+
+/* edit comment */
+.card-body form {
+    display: flex;
+    flex-direction: column;
+}
+
+.card-body .button-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.card-body .btn {
+    padding: 10px 20px;
+    font-weight: 500;
+    font-family: 'Poppins', sans-serif;
+}
+
+.card-body .btn-primary,
+.card-body .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 40px;
+    text-decoration: none;
+}
+
+.card-body .btn-secondary {
+    background-color: var(--highlight-color);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+}
+
+.card-body .btn-secondary:hover {
+    background-color: #3a3a3a;
+    color: var(--text-color);
+    text-decoration: none;
+}
+
+/* edit page style */
 .edit-post-heading {
     margin: 30px 0 20px;
     color: var(--primary-color);
@@ -997,6 +1045,10 @@ a:hover {
     .edit-form-cancel {
         width: 100%;
     }
+    
+    .card-body .button-group {
+        flex-direction: column;
+    }
 }
 
 @media (max-width: 360px) {
@@ -1010,136 +1062,5 @@ a:hover {
     
     .friends-container {
         grid-template-columns: 1fr 1fr;
-    }
-}
-
-
-.comments-section {
-    margin-top: 30px;
-    border-top: 1px solid #e0e0e0;
-    padding-top: 20px;
-}
-
-.comments-section h3 {
-    margin-bottom: 20px;
-    font-size: 1.5rem;
-}
-
-.comment-form {
-    margin-bottom: 25px;
-}
-
-.comment-form textarea {
-    min-height: 80px;
-    margin-bottom: 10px;
-    resize: vertical;
-}
-
-.comments-list {
-    margin-top: 20px;
-}
-
-.comment {
-    border-bottom: 1px solid #e0e0e0;
-    padding: 15px 0;
-    margin-bottom: 10px;
-}
-
-.comment:last-child {
-    border-bottom: none;
-}
-
-.comment-header {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 8px;
-}
-
-.comment-user {
-    font-weight: bold;
-}
-
-.comment-date {
-    color: #777;
-    font-size: 0.85rem;
-}
-
-.comment-content {
-    margin-bottom: 10px;
-    word-break: break-word;
-}
-
-.comment-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-}
-
-.edited-label {
-    font-style: italic;
-    font-size: 0.8rem;
-    color: #777;
-    margin-left: 5px;
-}
-
-.no-comments {
-    color: #777;
-    font-style: italic;
-    padding: 10px 0;
-}
-
-/* edit comment */
-.card-header > h3{
-    margin: 1rem 0;
-}
-
-.card-body form {
-    display: flex;
-    flex-direction: column;
-}
-
-.card-body .button-group {
-    display: flex;
-    gap: 10px;
-    margin-top: 15px;
-}
-
-.card-body .btn {
-    padding: 10px 20px;
-    border-radius: 5px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background-color 0.3s, transform 0.2s;
-    font-family: 'Poppins', sans-serif;
-}
-
-.card-body .btn-primary,
-.card-body .btn-secondary {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    height: 40px;
-    text-decoration: none;
-}
-
-.card-body .btn:hover {
-    transform: translateY(-2px);
-}
-
-.card-body .btn-secondary {
-    background-color: var(--highlight-color);
-    border: 1px solid var(--border-color);
-    color: var(--text-color);
-}
-
-.card-body .btn-secondary:hover {
-    background-color: #3a3a3a;
-    color: var(--text-color);
-    text-decoration: none;
-}
-
-@media (max-width: 576px) {
-    .card-body .button-group {
-        flex-direction: column;
     }
 }

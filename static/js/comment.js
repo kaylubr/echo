@@ -7,7 +7,7 @@ function closeDeleteModal() {
 }
 
 function openCommentDeleteModal(commentId) {
-    document.getElementById('deleteCommentForm').action = "{{ url_for('delete_comment', comment_id=0) }}".replace('/0', '/' + commentId);
+    document.getElementById('deleteCommentForm').action = `/comment/${commentId}/delete`;
     document.getElementById('deleteCommentModal').style.display = 'block';
 }
 

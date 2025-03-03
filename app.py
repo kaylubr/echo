@@ -7,14 +7,15 @@ from datetime import datetime
 import os
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'your-secret-key'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///blog.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config.update(
+    SECRET_KEY='231B',
+    SQLALCHEMY_DATABASE_URI='sqlite:///blog.db',
+    SQLALCHEMY_TRACK_MODIFICATIONS=False
+)
 
 db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
-
 migrate = Migrate(app, db)
 
 friendship = db.Table('friendships',
@@ -38,14 +39,19 @@ class User(UserMixin, db.Model):
     password_hash = db.Column(db.String(128), nullable=False)
     bio = db.Column(db.Text, default='')
     join_date = db.Column(db.DateTime, default=datetime.utcnow)
-    posts = db.relationship('Post', backref='author', lazy=True)
+    
+    # Relationships
+    posts = db.relationship('Post', backref='author', lazy=True, cascade='all, delete-orphan')
     likes = db.relationship('Like', backref='user', lazy='dynamic', cascade='all, delete-orphan')
-    friends = db.relationship('User', 
-                              secondary=friendship,
-                              primaryjoin=(friendship.c.user_id == id),
-                              secondaryjoin=(friendship.c.friend_id == id),
-                              backref=db.backref('followed_by', lazy='dynamic'),
-                              lazy='dynamic')
+    comments = db.relationship('Comment', backref='user', lazy='dynamic', cascade='all, delete-orphan')
+    friends = db.relationship(
+        'User', 
+        secondary=friendship,
+        primaryjoin=(friendship.c.user_id == id),
+        secondaryjoin=(friendship.c.friend_id == id),
+        backref=db.backref('followed_by', lazy='dynamic'),
+        lazy='dynamic'
+    )
     
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -65,8 +71,7 @@ class User(UserMixin, db.Model):
         return self.friends.filter(friendship.c.friend_id == user.id).count() > 0
     
     def friend_posts(self):
-        friend_ids = [user.id for user in self.friends]
-        friend_ids.append(self.id) 
+        friend_ids = [user.id for user in self.friends] + [self.id]
         return Post.query.filter(Post.user_id.in_(friend_ids)).order_by(Post.timestamp.desc())
     
     def like_post(self, post):
@@ -88,10 +93,12 @@ class Post(db.Model):
     content = db.Column(db.Text, nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    likes = db.relationship('Like', backref='post', lazy='dynamic', cascade='all, delete-orphan')
-    comments = db.relationship('Comment', backref='post', lazy='dynamic', cascade='all, delete-orphan')
     edited = db.Column(db.Boolean, default=False)
     edited_timestamp = db.Column(db.DateTime, nullable=True)
+    
+    # Relationships
+    likes = db.relationship('Like', backref='post', lazy='dynamic', cascade='all, delete-orphan')
+    comments = db.relationship('Comment', backref='post', lazy='dynamic', cascade='all, delete-orphan')
     
     def likes_count(self):
         return self.likes.count()
@@ -108,8 +115,6 @@ class Comment(db.Model):
     post_id = db.Column(db.Integer, db.ForeignKey('post.id'), nullable=False)
     edited = db.Column(db.Boolean, default=False)
     edited_timestamp = db.Column(db.DateTime, nullable=True)
-    
-    user = db.relationship('User', backref=db.backref('comments', lazy='dynamic'))
 
 
 @login_manager.user_loader
@@ -117,6 +122,33 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 
+# Helper functions
+def is_ajax_request():
+    return request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+
+
+def handle_content_validation(content_type, form_data):
+    """Validates form content based on content type"""
+    if content_type == 'post':
+        title, content = form_data.get('title'), form_data.get('content')
+        if not title or not content:
+            flash(f'Title and content are required!')
+            return False
+    elif content_type == 'comment':
+        content = form_data.get('content')
+        if not content:
+            flash('Comment cannot be empty!')
+            return False
+    return True
+
+
+def handle_edit_timestamps(item):
+    """Updates timestamps for edited items"""
+    item.edited = True
+    item.edited_timestamp = datetime.utcnow()
+
+
+# Routes
 @app.route('/')
 def index():
     if current_user.is_authenticated:
@@ -136,15 +168,11 @@ def signup():
         email = request.form.get('email')
         password = request.form.get('password')
         
-        user_exists = User.query.filter_by(username=username).first()
-        email_exists = User.query.filter_by(email=email).first()
-        
-        if user_exists:
-            flash('Username already exists.')
-            return redirect(url_for('signup'))
-        
-        if email_exists:
-            flash('Email already registered.')
+        # Check if username or email already exists
+        existing_user = User.query.filter((User.username == username) | (User.email == email)).first()
+        if existing_user:
+            field = 'Username' if existing_user.username == username else 'Email'
+            flash(f'{field} already exists.')
             return redirect(url_for('signup'))
         
         new_user = User(username=username, email=email)
@@ -186,6 +214,7 @@ def logout():
     logout_user()
     return redirect(url_for('index'))
 
+
 @app.route('/profile/<username>')
 @login_required
 def profile(username):
@@ -211,14 +240,14 @@ def edit_profile():
 @login_required
 def create_post():
     if request.method == 'POST':
-        title = request.form.get('title')
-        content = request.form.get('content')
-        
-        if not title or not content:
-            flash('Title and content are required!')
+        if not handle_content_validation('post', request.form):
             return redirect(url_for('create_post'))
         
-        post = Post(title=title, content=content, author=current_user)
+        post = Post(
+            title=request.form.get('title'),
+            content=request.form.get('content'),
+            author=current_user
+        )
         db.session.add(post)
         db.session.commit()
         
@@ -228,7 +257,6 @@ def create_post():
     return render_template('create_post.html')
 
 
-@login_required
 @app.route('/post/<int:post_id>')
 def post(post_id):
     post = Post.query.get_or_404(post_id)
@@ -246,20 +274,17 @@ def edit_post(post_id):
         return redirect(url_for('post', post_id=post.id))
     
     if request.method == 'POST':
+        if not handle_content_validation('post', request.form):
+            return redirect(url_for('edit_post', post_id=post.id))
+        
         title = request.form.get('title')
         content = request.form.get('content')
-        
-        if not title or not content:
-            flash('Title and content are required!')
-            return redirect(url_for('edit_post', post_id=post.id))
         
         if post.title != title or post.content != content:
             post.title = title
             post.content = content
-            post.edited = True
-            post.edited_timestamp = datetime.utcnow()
+            handle_edit_timestamps(post)
             db.session.commit()
-            
             flash('Your post has been updated!')
         else:
             flash('No changes were made to your post.')
@@ -292,7 +317,7 @@ def like_post(post_id):
     current_user.like_post(post)
     db.session.commit()
     
-    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+    if is_ajax_request():
         return jsonify({
             'likes_count': post.likes_count(),
             'liked': True
@@ -309,7 +334,7 @@ def unlike_post(post_id):
     current_user.unlike_post(post)
     db.session.commit()
     
-    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+    if is_ajax_request():
         return jsonify({
             'likes_count': post.likes_count(),
             'liked': False
@@ -324,7 +349,7 @@ def unlike_post(post_id):
 def users():
     all_users = User.query.filter(User.id != current_user.id).all()
     
-    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+    if is_ajax_request():
         users_data = [{
             'id': user.id,
             'username': user.username,
@@ -379,13 +404,15 @@ def remove_friend(user_id):
 @login_required
 def add_comment(post_id):
     post = Post.query.get_or_404(post_id)
-    content = request.form.get('content')
     
-    if not content:
-        flash('Comment cannot be empty!')
+    if not handle_content_validation('comment', request.form):
         return redirect(url_for('post', post_id=post_id))
     
-    comment = Comment(content=content, user_id=current_user.id, post_id=post_id)
+    comment = Comment(
+        content=request.form.get('content'),
+        user_id=current_user.id,
+        post_id=post_id
+    )
     db.session.add(comment)
     db.session.commit()
     
@@ -403,18 +430,15 @@ def edit_comment(comment_id):
         return redirect(url_for('post', post_id=comment.post_id))
     
     if request.method == 'POST':
-        content = request.form.get('content')
-        
-        if not content:
-            flash('Comment cannot be empty!')
+        if not handle_content_validation('comment', request.form):
             return redirect(url_for('edit_comment', comment_id=comment_id))
+        
+        content = request.form.get('content')
         
         if comment.content != content:
             comment.content = content
-            comment.edited = True
-            comment.edited_timestamp = datetime.utcnow()
+            handle_edit_timestamps(comment)
             db.session.commit()
-            
             flash('Your comment has been updated!')
         else:
             flash('No changes were made to your comment.')
