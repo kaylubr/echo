@@ -542,6 +542,58 @@ a:hover {
     margin-top: auto;
 }
 
+.search-container {
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+.search-input-wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 500px;
+}
+
+.search-input {
+    width: 100%;
+    padding: 10px 15px;
+    padding-right: 40px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    background-color: var(--card-color);
+    color: var(--text-color);
+    font-size: 16px;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+.clear-search-btn {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    font-size: 18px;
+    color: var(--text-light);
+    cursor: pointer;
+}
+
+.search-loading {
+    text-align: center;
+    padding: 20px;
+    color: var(--text-light);
+}
+
+.search-no-results {
+    text-align: center;
+    padding: 20px;
+    color: var(--text-light);
+}
+
+
 /* friends List */
 .friends-container {
     display: grid;
@@ -1051,3 +1103,4 @@ a:hover {
 #deletePostModal #deletePostForm button {
     margin: 0;
 }
+
