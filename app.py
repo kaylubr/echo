@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
-from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
+from flask_migrate import Migrate
+from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 import os
@@ -14,11 +15,12 @@ db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 
+migrate = Migrate(app, db)
+
 friendship = db.Table('friendships',
     db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
     db.Column('friend_id', db.Integer, db.ForeignKey('user.id'))
 )
-
 
 class Like(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -87,6 +89,8 @@ class Post(db.Model):
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     likes = db.relationship('Like', backref='post', lazy='dynamic', cascade='all, delete-orphan')
+    edited = db.Column(db.Boolean, default=False)
+    edited_timestamp = db.Column(db.DateTime, nullable=True)
     
     def likes_count(self):
         return self.likes.count()
@@ -207,6 +211,7 @@ def create_post():
     
     return render_template('create_post.html')
 
+
 @login_required
 @app.route('/post/<int:post_id>')
 def post(post_id):
@@ -232,11 +237,18 @@ def edit_post(post_id):
             flash('Title and content are required!')
             return redirect(url_for('edit_post', post_id=post.id))
         
-        post.title = title
-        post.content = content
-        db.session.commit()
-        
-        flash('Your post has been updated!')
+        # Check if content actually changed
+        if post.title != title or post.content != content:
+            post.title = title
+            post.content = content
+            post.edited = True
+            post.edited_timestamp = datetime.utcnow()
+            db.session.commit()
+            
+            flash('Your post has been updated!')
+        else:
+            flash('No changes were made to your post.')
+            
         return redirect(url_for('post', post_id=post.id))
     
     return render_template('edit_post.html', post=post)
