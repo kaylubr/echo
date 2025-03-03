@@ -52,7 +52,7 @@ a:hover {
     flex: 1;
 }
 
-/* Navbar */
+/* nav */
 .navbar {
     background-color: #181818;
     box-shadow: var(--box-shadow);
@@ -92,7 +92,6 @@ a:hover {
     color: var(--primary-color);
 }
 
-/* Mobile menu toggle */
 .mobile-menu-toggle {
     display: none;
     font-size: 1.5rem;
@@ -102,7 +101,7 @@ a:hover {
     cursor: pointer;
 }
 
-/* Buttons */
+/* buttons */
 .btn {
     display: inline-block;
     padding: 10px 20px;
@@ -152,7 +151,7 @@ a:hover {
     color: white;
 }
 
-/* Flash Messages */
+/* flash */
 .flash-messages {
     margin: 20px 0;
 }
@@ -171,7 +170,7 @@ a:hover {
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* Home Page */
+/* home page */
 .home-container {
     display: grid;
     grid-template-columns: 1fr 3fr;
@@ -292,7 +291,7 @@ a:hover {
     font-size: 1.1rem;
 }
 
-/* Auth Pages */
+/* authentication */
 .auth-container {
     display: flex;
     justify-content: center;
@@ -356,7 +355,7 @@ a:hover {
     text-align: center;
 }
 
-/* Profile Page */
+/* profile page */
 .profile-container {
     margin: 30px 0;
     padding: 0 15px;
@@ -405,7 +404,7 @@ a:hover {
     padding-bottom: 10px;
 }
 
-/* Form Container */
+/* form container */
 .form-container {
     background-color: var(--card-color);
     border-radius: 10px;
@@ -422,7 +421,7 @@ a:hover {
     padding-bottom: 10px;
 }
 
-/* Post Detail */
+/* post detail */
 .post-detail {
     background-color: var(--card-color);
     border-radius: 10px;
@@ -470,7 +469,7 @@ a:hover {
     flex-wrap: wrap;
 }
 
-/* Users List */
+/* users list */
 .users-container {
     margin: 30px 0;
     padding: 0 15px;
@@ -532,7 +531,7 @@ a:hover {
     margin-top: auto;
 }
 
-/* Friends List */
+/* friends List */
 .friends-container {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -594,7 +593,7 @@ a:hover {
     margin-top: 1rem;
 }
 
-/* Like button */
+/* like button */
 .post-likes {
     margin: 20px 0;
 }
@@ -632,7 +631,6 @@ a:hover {
     margin-right: 5px;
 }
 
-/* Responsive Design */
 @media (max-width: 992px) {
     .container {
         padding: 0 20px;
