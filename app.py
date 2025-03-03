@@ -66,7 +66,7 @@ class User(UserMixin, db.Model):
     
     def friend_posts(self):
         friend_ids = [user.id for user in self.friends]
-        friend_ids.append(self.id)  # Include own posts
+        friend_ids.append(self.id) 
         return Post.query.filter(Post.user_id.in_(friend_ids)).order_by(Post.timestamp.desc())
     
     def like_post(self, post):
@@ -89,11 +89,27 @@ class Post(db.Model):
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     likes = db.relationship('Like', backref='post', lazy='dynamic', cascade='all, delete-orphan')
+    comments = db.relationship('Comment', backref='post', lazy='dynamic', cascade='all, delete-orphan')
     edited = db.Column(db.Boolean, default=False)
     edited_timestamp = db.Column(db.DateTime, nullable=True)
     
     def likes_count(self):
         return self.likes.count()
+        
+    def comments_count(self):
+        return self.comments.count()
+
+
+class Comment(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    content = db.Column(db.Text, nullable=False)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    post_id = db.Column(db.Integer, db.ForeignKey('post.id'), nullable=False)
+    edited = db.Column(db.Boolean, default=False)
+    edited_timestamp = db.Column(db.DateTime, nullable=True)
+    
+    user = db.relationship('User', backref=db.backref('comments', lazy='dynamic'))
 
 
 @login_manager.user_loader
@@ -216,7 +232,8 @@ def create_post():
 @app.route('/post/<int:post_id>')
 def post(post_id):
     post = Post.query.get_or_404(post_id)
-    return render_template('post.html', post=post)
+    comments = Comment.query.filter_by(post_id=post_id).order_by(Comment.timestamp.asc()).all()
+    return render_template('post.html', post=post, comments=comments)
 
 
 @app.route('/edit_post/<int:post_id>', methods=['GET', 'POST'])
@@ -224,7 +241,6 @@ def post(post_id):
 def edit_post(post_id):
     post = Post.query.get_or_404(post_id)
     
-    # Check if the current user is the author of the post
     if post.author != current_user:
         flash('You can only edit your own posts!')
         return redirect(url_for('post', post_id=post.id))
@@ -237,7 +253,6 @@ def edit_post(post_id):
             flash('Title and content are required!')
             return redirect(url_for('edit_post', post_id=post.id))
         
-        # Check if content actually changed
         if post.title != title or post.content != content:
             post.title = title
             post.content = content
@@ -259,7 +274,6 @@ def edit_post(post_id):
 def delete_post(post_id):
     post = Post.query.get_or_404(post_id)
     
-    # Check if the current user is the author of the post
     if post.author != current_user:
         flash('You can only delete your own posts!')
         return redirect(url_for('post', post_id=post.id))
@@ -359,6 +373,72 @@ def remove_friend(user_id):
     db.session.commit()
     flash(f'You are no longer following {user.username}')
     return redirect(url_for('users'))
+
+
+@app.route('/post/<int:post_id>/comment', methods=['POST'])
+@login_required
+def add_comment(post_id):
+    post = Post.query.get_or_404(post_id)
+    content = request.form.get('content')
+    
+    if not content:
+        flash('Comment cannot be empty!')
+        return redirect(url_for('post', post_id=post_id))
+    
+    comment = Comment(content=content, user_id=current_user.id, post_id=post_id)
+    db.session.add(comment)
+    db.session.commit()
+    
+    flash('Your comment has been added!')
+    return redirect(url_for('post', post_id=post_id))
+
+
+@app.route('/comment/<int:comment_id>/edit', methods=['GET', 'POST'])
+@login_required
+def edit_comment(comment_id):
+    comment = Comment.query.get_or_404(comment_id)
+    
+    if comment.user_id != current_user.id:
+        flash('You can only edit your own comments!')
+        return redirect(url_for('post', post_id=comment.post_id))
+    
+    if request.method == 'POST':
+        content = request.form.get('content')
+        
+        if not content:
+            flash('Comment cannot be empty!')
+            return redirect(url_for('edit_comment', comment_id=comment_id))
+        
+        if comment.content != content:
+            comment.content = content
+            comment.edited = True
+            comment.edited_timestamp = datetime.utcnow()
+            db.session.commit()
+            
+            flash('Your comment has been updated!')
+        else:
+            flash('No changes were made to your comment.')
+            
+        return redirect(url_for('post', post_id=comment.post_id))
+    
+    return render_template('edit_comment.html', comment=comment)
+
+
+@app.route('/comment/<int:comment_id>/delete', methods=['POST'])
+@login_required
+def delete_comment(comment_id):
+    comment = Comment.query.get_or_404(comment_id)
+    
+    if comment.user_id != current_user.id:
+        flash('You can only delete your own comments!')
+        return redirect(url_for('post', post_id=comment.post_id))
+    
+    post_id = comment.post_id
+    db.session.delete(comment)
+    db.session.commit()
+    
+    flash('Your comment has been deleted!')
+    return redirect(url_for('post', post_id=post_id))
 
 
 if __name__ == '__main__':

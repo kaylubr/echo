@@ -1012,3 +1012,78 @@ a:hover {
         grid-template-columns: 1fr 1fr;
     }
 }
+
+
+.comments-section {
+    margin-top: 30px;
+    border-top: 1px solid #e0e0e0;
+    padding-top: 20px;
+}
+
+.comments-section h3 {
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+}
+
+.comment-form {
+    margin-bottom: 25px;
+}
+
+.comment-form textarea {
+    min-height: 80px;
+    margin-bottom: 10px;
+    resize: vertical;
+}
+
+.comments-list {
+    margin-top: 20px;
+}
+
+.comment {
+    border-bottom: 1px solid #e0e0e0;
+    padding: 15px 0;
+    margin-bottom: 10px;
+}
+
+.comment:last-child {
+    border-bottom: none;
+}
+
+.comment-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.comment-user {
+    font-weight: bold;
+}
+
+.comment-date {
+    color: #777;
+    font-size: 0.85rem;
+}
+
+.comment-content {
+    margin-bottom: 10px;
+    word-break: break-word;
+}
+
+.comment-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.edited-label {
+    font-style: italic;
+    font-size: 0.8rem;
+    color: #777;
+    margin-left: 5px;
+}
+
+.no-comments {
+    color: #777;
+    font-style: italic;
+    padding: 10px 0;
+}
