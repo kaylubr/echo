@@ -31,6 +31,22 @@
         </div>
     </nav>
 
+    <div id="logoutModal" class="modal logout-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Confirm Logout</h2>
+                <span class="close-modal" onclick="closeLogoutModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to log out?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeLogoutModal()">Cancel</button>
+                <a href="{{ url_for('logout') }}" class="btn btn-danger">Logout</a>
+            </div>
+        </div>
+    </div>
+
     <div class="container">
         {% with messages = get_flashed_messages() %}
             {% if messages %}
@@ -44,5 +60,6 @@
 
         {% block content %}{% endblock %}
     </div>
+    <script src="{{ url_for('static', filename='js/logout.js') }}"></script>
 </body>
 </html>
