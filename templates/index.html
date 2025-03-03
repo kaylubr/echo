@@ -24,31 +24,43 @@
         <h2>{% if current_user.is_authenticated %}Your Newsfeed{% else %}Recent Posts{% endif %}</h2>
         
         {% if posts %}
-            <div class="posts-container">
-                {% for post in posts %}
-                    <div class="post-card">
-                        <div class="post-header">
-                            <img src="https://ui-avatars.com/api/?name={{ post.author.username }}&background=random" alt="Profile" class="avatar">
-                            <div class="post-info">
-                                <h3><a href="{{ url_for('login') }}">{{ post.title }}</a></h3>
-                                <p class="author">By <a href="{{ url_for('login') }}">{{ post.author.username }}</a></p>
-                                <p class="date">{{ post.timestamp.strftime('%B %d, %Y at %H:%M') }}</p>
-                            </div>
-                        </div>
-                        <div class="post-content {% if not current_user.is_authenticated %}blurred-content{% endif %}">
-                            {% if current_user.is_authenticated %}
-                                <p>{{ post.content[:200] }}{% if post.content|length > 200 %}...{% endif %}</p>
-                                <a href="{{ url_for('post', post_id=post.id) }}" class="read-more">Read more</a>
-                            {% else %}
-                                <div class="login-overlay">
-                                    <p>Please <a href="{{ url_for('login') }}">login</a> to view content</p>
-                                </div>
-                                <p class="hidden-content">{{ post.content[:200] }}{% if post.content|length > 200 %}...{% endif %}</p>
-                            {% endif %}
+        <div class="posts-container">
+            {% for post in posts %}
+                <div class="post-card">
+                    <div class="post-header">
+                        <img src="https://ui-avatars.com/api/?name={{ post.author.username }}&background=random" alt="Profile" class="avatar">
+                        <div class="post-info">
+                            <h3>
+                                {% if current_user.is_authenticated %}
+                                    <a href="{{ url_for('post', post_id=post.id) }}">{{ post.title }}</a>
+                                {% else %}
+                                    <a href="{{ url_for('login') }}">{{ post.title }}</a>
+                                {% endif %}
+                            </h3>
+                            <p class="author">By 
+                                {% if current_user.is_authenticated %}
+                                    <a href="{{ url_for('profile', username=post.author.username) }}">{{ post.author.username }}</a>
+                                {% else %}
+                                    <a href="{{ url_for('login') }}">{{ post.author.username }}</a>
+                                {% endif %}
+                            </p>
+                            <p class="date">{{ post.timestamp.strftime('%B %d, %Y at %H:%M') }}</p>
                         </div>
                     </div>
-                {% endfor %}
-            </div>
+                    <div class="post-content {% if not current_user.is_authenticated %}blurred-content{% endif %}">
+                        {% if current_user.is_authenticated %}
+                            <p>{{ post.content[:200] }}{% if post.content|length > 200 %}...{% endif %}</p>
+                            <a href="{{ url_for('post', post_id=post.id) }}" class="read-more">Read more</a>
+                        {% else %}
+                            <div class="login-overlay">
+                                <p>Please <a href="{{ url_for('login') }}">login</a> to view content</p>
+                            </div>
+                            <p class="hidden-content">{{ post.content[:200] }}{% if post.content|length > 200 %}...{% endif %}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
         {% else %}
             <div class="empty-state">
                 <i class="fas fa-newspaper"></i>
