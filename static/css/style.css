@@ -1087,3 +1087,59 @@ a:hover {
     font-style: italic;
     padding: 10px 0;
 }
+
+/* edit comment */
+.card-header > h3{
+    margin: 1rem 0;
+}
+
+.card-body form {
+    display: flex;
+    flex-direction: column;
+}
+
+.card-body .button-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.card-body .btn {
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+    font-family: 'Poppins', sans-serif;
+}
+
+.card-body .btn-primary,
+.card-body .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 40px;
+    text-decoration: none;
+}
+
+.card-body .btn:hover {
+    transform: translateY(-2px);
+}
+
+.card-body .btn-secondary {
+    background-color: var(--highlight-color);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+}
+
+.card-body .btn-secondary:hover {
+    background-color: #3a3a3a;
+    color: var(--text-color);
+    text-decoration: none;
+}
+
+@media (max-width: 576px) {
+    .card-body .button-group {
+        flex-direction: column;
+    }
+}

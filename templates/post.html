@@ -59,7 +59,6 @@
         </div>
     </div>
     
-    <!-- Comments Section -->
     <div class="comments-section">
         <h3>Comments ({{ post.comments_count() }})</h3>
         
@@ -112,7 +111,6 @@
         </div>
     </div>
     
-    <!-- Post Delete Modal -->
     <div id="deletePostModal" class="modal" style="display: none;">
         <div class="modal-content">
             <div class="modal-header">
@@ -131,7 +129,6 @@
         </div>
     </div>
     
-    <!-- Comment Delete Modal -->
     <div id="deleteCommentModal" class="modal" style="display: none;">
         <div class="modal-content">
             <div class="modal-header">
@@ -151,26 +148,7 @@
     </div>
 
     {% if current_user.is_authenticated %}
-        <script>
-            function openDeleteModal() {
-                document.getElementById('deletePostModal').style.display = 'block';
-            }
-            
-            function closeDeleteModal() {
-                document.getElementById('deletePostModal').style.display = 'none';
-            }
-            
-            // New comment deletion functionality
-            function openCommentDeleteModal(commentId) {
-                // If needed, convert to number: commentId = parseInt(commentId);
-                document.getElementById('deleteCommentForm').action = "{{ url_for('delete_comment', comment_id=0) }}".replace('/0', '/' + commentId);
-                document.getElementById('deleteCommentModal').style.display = 'block';
-            }
-            
-            function closeCommentDeleteModal() {
-                document.getElementById('deleteCommentModal').style.display = 'none';
-            }
-        </script>
+        <script src="{{ url_for('static', filename='js/comment.js') }}"></script>
     {% endif %}
 
 {% endblock %}
