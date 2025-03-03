@@ -309,7 +309,36 @@ def unlike_post(post_id):
 @login_required
 def users():
     all_users = User.query.filter(User.id != current_user.id).all()
+    
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        users_data = [{
+            'id': user.id,
+            'username': user.username,
+            'join_date': user.join_date.strftime('%B %d, %Y'),
+            'is_friend': current_user.is_friend(user)
+        } for user in all_users]
+        return jsonify({'users': users_data})
+    
     return render_template('users.html', users=all_users)
+
+
+@app.route('/search_users')
+@login_required
+def search_users():
+    query = request.args.get('q', '')
+    users = User.query.filter(
+        User.id != current_user.id,
+        User.username.ilike(f'%{query}%')
+    ).all()
+    
+    users_data = [{
+        'id': user.id,
+        'username': user.username,
+        'join_date': user.join_date.strftime('%B %d, %Y'),
+        'is_friend': current_user.is_friend(user)
+    } for user in users]
+    
+    return jsonify({'users': users_data})
 
 
 @app.route('/add_friend/<int:user_id>')
